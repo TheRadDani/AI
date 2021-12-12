@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Neuronal network App</title>
+	<style type="text/css">
+		#sitio {
+			padding: 5rem;
+			font-size: 5rem;
+			margin-left: 15rem;
+		}
+	</style>
+</head>
+<body>
+	<input data-jscolor="{value:'#CC66FF'}", onInput="update(this.jscolor)">
+	<div id="sitio">
+		My website
+	</div>
+
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.4.5/jscolor.min.js"></script>
+	<script src="https://unpkg.com/brain.js"></script>
+
+	<script type="text/javascript">
+		//Initialize neuronal network
+		var network = new brain.NeuralNetwork();
+
+		/*Train it to change the font color to black
+        or white depending on the background color
+		 */
+		network.train([
+			//black background -> white font
+			{input: {red: 0, green: 0, blue: 0}, output: {color: 1}},
+			//white background -> black font
+			{input: {red: 1, green: 1, blue: 1}, output: {color: 0}},
+			//green background -> black font
+			{input: {red: 0, green: 1, blue: 0}, output: {color: 0}},
+			//blue background -> white font
+			{input: {red: 0, green: .43, blue: 1}, output: {color: 1}},
+			//red background -> white font
+			{input: {red: 1, green: 0, blue: 0}, output: {color: 1}},
+		]);
+
+		function update(color) {
+			//.rgb {object} = color.channels
+
+			var rgb = [color.channels.r, color.channels.g, color.channels.b];
+			//console.log(rgb);
+
+			var div = document.getElementById("sitio");
+			div.style.background = color.toHEXString(); //Form to give the background color
+
+			//background choosed for the user is the input to make the election over the background
+			var input = {
+				red: rgb[0]/255,
+				green: rgb[1]/255,
+				blue: rgb[2]/255,
+			};
+
+			//get networks's prediction
+			var result = network.run(input);
+			//console.log(resultado);
+
+			//if result > .5, font color is white
+			if (result.color > .5) {
+				div.style.color = "white";
+			}  else {
+				div.style.color = "black";
+			}
+		}
+	</script>
+</body>
+</html>
